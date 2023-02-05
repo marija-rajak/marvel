@@ -8,29 +8,30 @@ let query;
 
 var typingTimeout;
 
-searchField.addEventListener('input', function () {
+searchField.addEventListener('input', getInput);
+
+function getInput () {
 	document.getElementById('loader').style.display = 'block';
 	query = this.value;
 	console.log(query);
 
-		if (query !== "") {
-			container.innerHTML = '';
-			setTimeout(getCharacters, 1000);
+	if (query !== "") {
+		container.innerHTML = '';
+		setTimeout(getCharacters, 1000);
 
-		} else {
-			loader.style.display = 'none';
-			showFavourites();
-		}
-});
+	} else {
+		loader.style.display = 'none';
+		showFavourites();
+	}
+}
 
 window.addEventListener('load', showFavourites);
 
 function getCharacters() {
+	let favourites = localStorage.getItem('favourites');
 	fetch(baseURL + '?nameStartsWith=' + query + "&" + authentication)
 		.then(response => response.json())
 		.then(characters => {
-
-
 			if (characters.data.results.length) {
 				let favourites = JSON.parse(localStorage.getItem('favourites'));
 				characters.data.results.forEach(character => {
@@ -39,14 +40,14 @@ function getCharacters() {
 						<div class="character">
 						<img src="${character.thumbnail.path}.${character.thumbnail.extension}">
 						<div class="imgFooter">${character.name}<i class="fa-solid fa-star" onclick="manageFavourites('${character.name}', '${character.id}')"></i>
-						</div>
-					`
+						</div>`;
 				});
 			} else {
-				container.innerHTML += `Nema`;
+				query = searchField.value;
+				header.innerHTML += 'Nema nikoga s tim imenom. Probajte neku drugu pretragu';
+
 			}
 			loader.style.display = 'none';
-
 		});
 }
 
@@ -82,7 +83,7 @@ function manageFavourites(characterName, characterId) {
 		favouritesSet.push(favouriteCharacter);
 	}
 	localStorage.setItem('favourites', JSON.stringify(favouritesSet));
-	//showFavourites();
+	showFavourites();
 }
 
 function showFavourites() {
@@ -105,4 +106,9 @@ function showFavourites() {
 
 			);
 	});
+}
+
+function reset() {
+	query = "";
+	searchField.value = "";
 }
