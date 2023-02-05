@@ -19,7 +19,7 @@ h1 {
 	color: red;
 }
 
-input  {
+input {
 	display: block;
 	padding: 10px;
 	border-radius: 50px;
@@ -27,12 +27,12 @@ input  {
 	margin: auto;
 	text-align: center;
 	color: red;
+	outline: none;
 }
-input:active, input:focus {
-	border: 3px solid red;
-}
+
 header {
 	padding: 30px 0 50px;
+	text-align: center;
 }
 
 header p {
@@ -62,16 +62,17 @@ header p {
 	bottom: 0;
 	background-color: red;
 	font-weight: bold;
-	text-align: center;
+	text-align: left;
 	width: 100%;
 	color: rgb(247, 209, 209);
-	display: flex;
-	justify-content: space-between;
 }
 
 .fa-star {
 	color: rgb(247, 209, 209);
 	cursor: pointer;
+	position: absolute;
+	bottom: 0;
+	right: 0;
 }
 
 .fa-star:hover {
@@ -79,21 +80,23 @@ header p {
 	transform: scale(3);
 }
 
-/* .tooltip {
+.tooltip {
 	position: absolute;
-	bottom:0;
-	right:0;
-	width: 20%;
-	font-size: 1rem;
+	bottom: 1rem;
+	right: 2rem;
+	width: 60px;
+	font-size: 0.8rem;
 	color: black;
 	display: none;
+	background-color: rgb(255, 244, 182);
+	border-radius: 5px;
+	text-align: center;
 }
 
-.fa-star:hover>.tooltip {
-	transform: scale(0.3);
+.fa-star:hover~.tooltip {
 	display: block;
 }
- */
+
 .loaderDot {
 	width: 20px;
 	height: 20px;
@@ -103,19 +106,19 @@ header p {
 	bottom: 0;
 }
 
-.loaderDot:first-of-type{
+.loaderDot:first-of-type {
 	animation: dots 1s linear infinite normal;
-	left:0;
+	left: 0;
 }
 
 .loaderDot:nth-of-type(2) {
 	animation: dots 1s linear 0.25s infinite normal;
-	left:40px;
+	left: 40px;
 }
 
 .loaderDot:nth-of-type(3) {
 	animation: dots 1s linear 0.75s infinite normal;
-	left:80px;
+	left: 80px;
 }
 
 #loader {
@@ -123,6 +126,15 @@ header p {
 	position: relative;
 	margin-top: 50px;
 	display: none;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.info {
+	grid-column: 2/4;
+	grid-row: 1/2;
+	text-align: center;
+	color: red;
 }
 
 @keyframes dots {
@@ -130,7 +142,7 @@ header p {
 		bottom: 0;
 	}
 
-	25%{
+	25% {
 		bottom: 20px;
 	}
 
@@ -140,5 +152,19 @@ header p {
 
 	100% {
 		bottom: 0;
+	}
+}
+
+@media all and (max-width: 786px) {
+	#container {
+		grid-template-columns: repeat(2, calc(50% - 10px));
+		grid-template-rows: repeat(10, 300px);
+	}
+}
+
+@media all and (max-width: 568px) {
+	#container {
+		grid-template-columns: 100%;
+		grid-template-rows: repeat(20, 300px);
 	}
 }

@@ -10,10 +10,9 @@ var typingTimeout;
 
 searchField.addEventListener('input', getInput);
 
-function getInput () {
+function getInput() {
 	document.getElementById('loader').style.display = 'block';
 	query = this.value;
-	console.log(query);
 
 	if (query !== "") {
 		container.innerHTML = '';
@@ -34,18 +33,22 @@ function getCharacters() {
 		.then(characters => {
 			if (characters.data.results.length) {
 				let favourites = JSON.parse(localStorage.getItem('favourites'));
+				let favouriteIds = [];
+				if (favourites) {
+					favouriteIds = favourites.map(function (fav) {
+						return parseInt(fav.id);
+					});
+				}
 				characters.data.results.forEach(character => {
-
 					container.innerHTML += `
 						<div class="character">
 						<img src="${character.thumbnail.path}.${character.thumbnail.extension}">
-						<div class="imgFooter">${character.name}<i class="fa-solid fa-star" onclick="manageFavourites('${character.name}', '${character.id}')"></i>
-						</div>`;
+						<div class="imgFooter">${character.name} ${addFooter(character.id, favouriteIds, character)} </div>`;
 				});
 			} else {
-				query = searchField.value;
-				header.innerHTML += 'Nema nikoga s tim imenom. Probajte neku drugu pretragu';
-
+				//ako se poruka upise u element header, ne moze se nastaviti pretraga; ako se upise u container, program i dalje radi???
+				//header.innerHTML += '<div class="info">Nema nikoga s tim imenom. Probajte neku drugu pretragu</div>';
+				container.innerHTML += '<div class="info">Nema nikoga s tim imenom. Probajte neku drugu pretragu</div>';
 			}
 			loader.style.display = 'none';
 		});
@@ -58,10 +61,15 @@ function manageFavourites(characterName, characterId) {
 		id: characterId
 	}
 
-	window.onclick = function (e) {
+	container.onclick = function (e) {
 		let star = e.target;
-		console.log(star);
-		star.style.color = 'rgb(255, 217, 0)';
+		if (star.style.color === 'rgb(255, 217, 0)') {
+			star.style.color = 'rgb(247, 209, 209)';
+			star.nextElementSibling.innerHTML = "add to favourites"
+		} else {
+			star.style.color = 'rgb(255, 217, 0)';
+			star.nextElementSibling.innerHTML = "remove from favourites"
+		}
 	};
 
 	let favouritesSet = JSON.parse(localStorage.getItem('favourites'));
@@ -83,32 +91,45 @@ function manageFavourites(characterName, characterId) {
 		favouritesSet.push(favouriteCharacter);
 	}
 	localStorage.setItem('favourites', JSON.stringify(favouritesSet));
-	showFavourites();
 }
 
 function showFavourites() {
 	container.innerHTML = "";
 	let bookmarks = JSON.parse(localStorage.getItem('favourites'));
-	bookmarks.forEach(function (bookmark) {
-		fetch(baseURL + "/" + bookmark.id + "?" + authentication)
-			.then(function (response) {
-				return response.json();
 
-			}).then(function (bookmarked) {
-				let character = bookmarked.data.results[0];
-				container.innerHTML += `
+	if (bookmarks) {
+		bookmarks.forEach(function (bookmark) {
+			fetch(baseURL + "/" + bookmark.id + "?" + authentication)
+				.then(function (response) {
+					return response.json();
+
+				}).then(function (bookmarked) {
+					let character = bookmarked.data.results[0];
+					container.innerHTML += `
 				<div class="character">
 				<img src="${character.thumbnail.path}.${character.thumbnail.extension}">
-				<div class="imgFooter">${character.name}<i class="fa-solid fa-star" style="color: rgb(255, 217, 0);" onclick="manageFavourites('${character.name}', '${character.id}')"></i>
-				</div>
-			`
-			}
-
-			);
-	});
+				<div class="imgFooter">${character.name}
+					<i class="fa-solid fa-star" style="color: rgb(255, 217, 0);" onclick="manageFavourites('${character.name}', '${character.id}')"></i>
+					<p class="tooltip">remove from favourites</p>
+				</div>`;
+				});
+		});
+	}
 }
 
-function reset() {
-	query = "";
-	searchField.value = "";
+
+function addFooter(id, array, obj) {
+	let footer;
+	if (array.includes(id)) {
+		footer =
+			`<i class="fa-solid fa-star" style="color: rgb(255, 217, 0);" onclick="manageFavourites('${obj.name}', '${obj.id}')"></i>
+			<p class="tooltip">remove from favourites</p>`;
+	} else {
+		footer =
+		`<i class="fa-solid fa-star" onclick="manageFavourites('${obj.name}', '${obj.id}')"></i>
+		<p class="tooltip">add to favourites</p>`;
+	}
+
+		return footer;
+
 }
